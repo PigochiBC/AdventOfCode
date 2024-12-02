@@ -122,8 +122,6 @@ public class solve {
             returnMe = remove(input, problemIndex);
         }else if(!decreasing && Integer.parseInt(input[problemIndex]) > Integer.parseInt(input[problemIndex+1])){
             returnMe = remove(input, problemIndex);
-        }else{
-            returnMe = remove(input, problemIndex);
         }
 
         if(!(Math.abs(Integer.parseInt(input[problemIndex]) - Integer.parseInt(input[problemIndex + 1])) >= 1 && Math.abs(Integer.parseInt(input[problemIndex]) - Integer.parseInt(input[problemIndex + 1])) <= 3)){
