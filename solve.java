@@ -13,11 +13,7 @@ public class solve {
         ArrayList<String> fileData = getFileData("input.txt");
         for (int i = 0; i < fileData.size(); i++) {
             String[] noSpaces = fileData.get(i).split(" ");
-            if (Integer.parseInt(noSpaces[0]) > Integer.parseInt(noSpaces[1])) {
-                decreasing = true;
-            } else {
-                decreasing = false;
-            }
+
             if(handleWhichBadCase(noSpaces)){
                 safeCases++;
             }
@@ -63,7 +59,13 @@ public class solve {
     public static boolean handleWhichBadCase(String[] input){
 
         for(int i = 0; i < input.length; i++){
-            String[] currentIteration = remove(input, Integer.parseInt(input[i]));
+            String[] currentIteration = remove(input, i);
+            if (Integer.parseInt(input[0]) > Integer.parseInt(input[1])) {
+                decreasing = true;
+            } else {
+                decreasing = false;
+            }
+            int switches = 0;
             for(int j = 0; j < currentIteration.length-1; j++){
                 if(Integer.parseInt(currentIteration[j]) > Integer.parseInt(currentIteration[j+1])){
                     decreasing=true;
