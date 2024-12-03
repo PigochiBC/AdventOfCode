@@ -16,7 +16,6 @@ public class solve{
         ArrayList<ArrayList<Integer>> dontEndIndexes = new ArrayList<>();
 
 
-        boolean canCountIt;
         for(int i = 0; i < fileData.size(); i++){
             Pattern toFind = Pattern.compile("mul\\([0-9]{1,3},[0-9]{1,3}\\)", Pattern.CASE_INSENSITIVE);
             Matcher find = toFind.matcher(fileData.get(i));
@@ -40,28 +39,63 @@ public class solve{
                 dontEndIndexes.get(i).add(find.end());
             }
         }
-        System.out.println(doEndIndexes);
-        System.out.println(dontEndIndexes);
-        System.out.println(caseStartIndexes);
-
-
+        boolean canCountIt = true;
+        int currentDoIndex = 0;
+        int currentDontIndex = 0;
         int total =0;
-        int caseStartIndex = 0;
-        int currentDoOrDont = doEndIndexes.get(0).get(0);
-        int currentDoOrDontIndex = 0;
-        for(int i = 0; i < cases.size(); i++){
-            //if case start index > current do or dont index, find new currentDoOrDontindex and continue
-            if(caseStartIndexes.get(i).get(caseStartIndex) > currentDoOrDont){
-                if(doEndIndexes.get(i).get(0)){
+        int count = 0;
+        System.out.println(doEndIndexes);
+        for(int i =0 ; i < caseStartIndexes.size(); i++){
+            for(int j = 0; j < caseStartIndexes.get(i).size(); j++){
+                count++;
+                if (canCountIt){
+                    try{
+                        if(doEndIndexes.get(i).get(currentDoIndex) < caseStartIndexes.get(i).get(j)){
+                            try{
+                                if(doEndIndexes.get(i).get(currentDoIndex+1) > dontEndIndexes.get(i).get(currentDontIndex) ){
+                                    currentDoIndex++;
+                                    canCountIt = false;
+                                }
+                            }catch(IndexOutOfBoundsException e){
+                                canCountIt = false;
+                                currentDoIndex = 0;
+                            }
+                        }else{
+                            total+=(Integer.parseInt(cases.get(count).split("[^0-9]{1,4}")[1].split(",")[0]) * Integer.parseInt(cases.get(count).split("[^0-9]{1,4}")[2]));
+                        }
+                    }catch(IndexOutOfBoundsException e){
+                        if(doEndIndexes.get(i).get(1) < caseStartIndexes.get(i).get(j)){
+                            try{
+                                if(doEndIndexes.get(i).get(currentDoIndex+1) > dontEndIndexes.get(i).get(currentDontIndex) ){
+                                    currentDoIndex++;
+                                    canCountIt = false;
+                                }
+                            }catch(IndexOutOfBoundsException s){
+                                canCountIt = false;
+                                currentDoIndex = 0;
+                            }
+                        }else{
+                            total+=(Integer.parseInt(cases.get(count).split("[^0-9]{1,4}")[1].split(",")[0]) * Integer.parseInt(cases.get(count).split("[^0-9]{1,4}")[2]));
+                        }
+                    }
+                }else{
+                    try{
+                        if(dontEndIndexes.get(i).get(currentDontIndex) < caseStartIndexes.get(i).get(j)){
+                            if(dontEndIndexes.get(i).get(currentDontIndex+1) > dontEndIndexes.get(i).get(currentDontIndex) ){
+                                currentDontIndex++;
+                                canCountIt = true;
+                            }
+                        }
+                    }catch(IndexOutOfBoundsException e){
+                        canCountIt = true;
+                        currentDontIndex = 0;
+                    }
 
                 }
+
             }
-            total+=(Integer.parseInt(cases.get(i).split("[^0-9]{1,4}")[1].split(",")[0]) * Integer.parseInt(cases.get(i).split("[^0-9]{1,4}")[2]));
         }
-
-
         System.out.println(total);
-
     }
 
     public static ArrayList<String> getFileData(String fileName) {
