@@ -14,7 +14,7 @@ public class solve {
         System.out.println(fileData);
 
         int total =0;
-        for(int i =0; i < fileData.size(); i++){
+        for(int i =0; i < fileData.size()-2; i++){
 
             for(int j = 0; j < fileData.get(i).length()-2; j++){
                 /*
@@ -34,13 +34,14 @@ public class solve {
                                 *A* OR  *A*
                                 S*M     S*S
 
-                    Make new algorithms for each of the common variations as new 'directions', one South, one North, one East, and one West
+                    Check diagonals -> check if they spell SAM / MAS -> next index.
+                    Array Max = length -2 (starting upper left for all)
+
                  */
                 try{
-                    if(checkForWord(fileData, i, j, "NorthEast", 0) )total++;
-                    if(checkForWord(fileData, i, j, "NorthWest", 0))total++;
-                    if(checkForWord(fileData, i, j, "SouthEast",0))total++;
-                    if(checkForWord(fileData, i, j, "SouthWest", 0))total++;
+                    if(checkForWord(fileData, i, j)){
+                        total++;
+                    }
                 }catch(IndexOutOfBoundsException e){
 
                 }
@@ -51,51 +52,12 @@ public class solve {
     }
 
     //recursively check 2D array for XMAS in every direction
-    public static boolean checkForWord(ArrayList<String> inputArray, int row, int column, String direction, int iteration){
-        String toCheck = "M";
-        //change what we're looking for based on input of iteration
-        switch(iteration){
-            case 1:
-                toCheck = "A";
-                break;
-            case 2:
-                toCheck = "S";
-                break;
-        }
-        if((row < 0 || row > inputArray.size() -1 )){
-            return false;
-        }
-
-        if((column < 0)){
-            return false;
-        }
-        if(column + 1 > inputArray.get(row).length()){
-
-            if(inputArray.get(row).substring(column-1).equals(toCheck)) {
-                return toCheck.equals("S");
-            }
-            return false;
-        }
-        //working
-
-        if(inputArray.get(row).substring(column,column+1).equals(toCheck)){
-            if(toCheck.equals("S")){
-                return true;
-            }
-            switch(direction){
-
-                case "NorthEast":
-                    return checkForWord(inputArray, row-1, column+1, direction, iteration+1);
-                case "SouthEast":
-                    return checkForWord(inputArray, row+1, column+1, direction, iteration+1);
-                case "SouthWest":
-                    return checkForWord(inputArray, row+1, column-1, direction, iteration+1);
-                case "NorthWest":
-                    return checkForWord(inputArray, row-1, column-1, direction, iteration+1);
-            }
-        }
-
-        return false;
+    public static boolean checkForWord(ArrayList<String> inputArray, int row, int column){
+        String neDiagonal = inputArray.get(row).charAt(column) + "" + inputArray.get(row+1).charAt(column+1) + "" + inputArray.get(row+2).charAt(column+2);
+        String seDiagonal = inputArray.get(row+2).charAt(column) + "" + inputArray.get(row+1).charAt(column+1) + "" + inputArray.get(row).charAt(column+2);
+        boolean samOrmasNE = neDiagonal.equals("SAM") || neDiagonal.equals("MAS");
+        boolean samOrMasSE = seDiagonal.equals("SAM") || seDiagonal.equals("MAS");
+        return samOrMasSE && samOrmasNE;
     }
     public static ArrayList<String> getFileData(String fileName) {
         ArrayList<String> fileData = new ArrayList<String>();
