@@ -10,20 +10,41 @@ import java.util.List;
 
 public class solve {
     public static void main(String[] args){
-        ArrayList<String> fileData = getFileData("Day4/input.txt");
+        ArrayList<String> fileData = getFileData("input.txt");
         System.out.println(fileData);
 
         int total =0;
         for(int i =0; i < fileData.size(); i++){
-            for(int j = 0; j < fileData.get(i).length(); j++){
-                if(checkForWord(fileData, i, j, "North", 0))total++;
-                else if(checkForWord(fileData, i, j, "East", 0))total++;
-                else if(checkForWord(fileData, i, j, "South", 0))total++;
-                else if(checkForWord(fileData, i, j, "West", 0))total++;
-                else if(checkForWord(fileData, i, j, "NorthEast", 0))total++;
-                else if(checkForWord(fileData, i, j, "NorthWest", 0))total++;
-                else if(checkForWord(fileData, i, j, "SouthEast",0))total++;
-                else if(checkForWord(fileData, i, j, "SouthWest", 0))total++;
+
+            for(int j = 0; j < fileData.get(i).length()-2; j++){
+                /*
+                    Northeast : S*S    M*S
+                                *A* OR *A*
+                                M*M    M*S
+
+                    Northwest : S*S    S*M
+                                *A* OR *A*
+                                M*M    S*M
+
+                    Southeast : M*M     M*S
+                                *A* OR  *A*
+                                S*S     M*S
+
+                    Southwest : S*M     M*M
+                                *A* OR  *A*
+                                S*M     S*S
+
+                    Make new algorithms for each of the common variations as new 'directions', one South, one North, one East, and one West
+                 */
+                try{
+                    if(checkForWord(fileData, i, j, "NorthEast", 0) )total++;
+                    if(checkForWord(fileData, i, j, "NorthWest", 0))total++;
+                    if(checkForWord(fileData, i, j, "SouthEast",0))total++;
+                    if(checkForWord(fileData, i, j, "SouthWest", 0))total++;
+                }catch(IndexOutOfBoundsException e){
+
+                }
+
             }
         }
         System.out.println(total);
@@ -31,39 +52,38 @@ public class solve {
 
     //recursively check 2D array for XMAS in every direction
     public static boolean checkForWord(ArrayList<String> inputArray, int row, int column, String direction, int iteration){
-        String toCheck = "X";
+        String toCheck = "M";
         //change what we're looking for based on input of iteration
         switch(iteration){
             case 1:
-                toCheck = "M";
-                break;
-            case 2:
                 toCheck = "A";
                 break;
-            case 3:
+            case 2:
                 toCheck = "S";
                 break;
         }
-        if(row-1 < 0 || row +1 > inputArray.size()){
+        if((row < 0 || row > inputArray.size() -1 )){
             return false;
         }
-        if(column-1 <0 || column +1 > inputArray.get(row).length()){
+
+        if((column < 0)){
             return false;
         }
+        if(column + 1 > inputArray.get(row).length()){
+
+            if(inputArray.get(row).substring(column-1).equals(toCheck)) {
+                return toCheck.equals("S");
+            }
+            return false;
+        }
+        //working
+
         if(inputArray.get(row).substring(column,column+1).equals(toCheck)){
             if(toCheck.equals("S")){
-                System.out.println("Found Case at " + row + ":" + column);
                 return true;
             }
             switch(direction){
-                case "North":
-                    return checkForWord(inputArray, row-1, column, direction, iteration+1);
-                case "East":
-                    return checkForWord(inputArray, row, column+1, direction, iteration+1);
-                case "South":
-                    return checkForWord(inputArray, row+1, column, direction, iteration+1);
-                case "West":
-                    return checkForWord(inputArray, row, column-1, direction, iteration+1);
+
                 case "NorthEast":
                     return checkForWord(inputArray, row-1, column+1, direction, iteration+1);
                 case "SouthEast":
