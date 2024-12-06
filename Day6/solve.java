@@ -96,97 +96,74 @@ public class solve {
         Step 3. Run a new simulation of guard path
         Step 4. Check for infinite loop, and add to the total if case is found
      */
-    public static int part2(ArrayList<String> input){
-        ArrayList<ArrayList<Integer>> xLocations = new ArrayList<>();
-        ArrayList<String> copy;
-        //step 1
-        for(int i = 0; i < input.size(); i++){
-            for(int j = 0; j < input.get(i).length(); j++){
-                if(input.get(i).charAt(j) == "X".toCharArray()[0]){
-                    ArrayList<Integer> xCoord = new ArrayList<>();
-                    xCoord.add(i);
-                    xCoord.add(j);
-                    xLocations.add(xCoord);
-                }
-            }
-        }
+    public static int part2(ArrayList<String> fileData){
+        String direction = "N";
+        int[] guardLocation = new int[]{94,73};
+        for(int i = 0; i < fileData.size(); i++){
+            for(int j = 0; j < fileData.get(i).length(); j++){
+                while(true){
+                    try{
+                        switch(direction){
+                            case "N":
+                                if(fileData.get(guardLocation[0]-1).charAt(guardLocation[1]) == "#".toCharArray()[0]){
+                                    direction = "E";
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[1] = guardLocation[1] + 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                }else{
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[0] = guardLocation[0] - 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
 
-        //step 2 and 3 and 4
-        copy = (ArrayList)input.clone();
-        int total = 0;
-        for(int i = 0; i < xLocations.size(); i++){
-            try{
-                if(!((xLocations.get(i).get(0) == 94) && (xLocations.get(i).get(1) == 73)))copy.set(xLocations.get(i).get(0), copy.get(xLocations.get(i).get(0)).substring(0,xLocations.get(i).get(1)) + "#" + copy.get(xLocations.get(i).get(0)).substring(xLocations.get(i).get(1)+1));
-            }catch(IndexOutOfBoundsException e){
-                System.out.println("IOOBE caught during step 2");
-            }
-            String direction = "N";
-            int[] guardLocation = new int[]{94,73};
-            long currentTime = System.currentTimeMillis();
-            while(true){
+                                }
+                                break;
+                            case "E":
+                                if(fileData.get(guardLocation[0]).charAt(guardLocation[1]+1) == "#".toCharArray()[0]){
+                                    direction = "S";
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[0] = guardLocation[0] + 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                }else{
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[1] = guardLocation[1] + 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                }
+                                break;
+                            case "S":
+                                if(fileData.get(guardLocation[0]+1).charAt(guardLocation[1]) == "#".toCharArray()[0]){
+                                    direction = "W";
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[1] = guardLocation[1] - 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                }else{
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[0] = guardLocation[0] + 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
 
-                if(System.currentTimeMillis() > currentTime + 10){
-                    System.out.println(total);
-                    total++;
-                    break;
-                }
+                                }
+                                break;
+                            case "W":
+                                if(fileData.get(guardLocation[0]).charAt(guardLocation[1]-1) == "#".toCharArray()[0]){
+                                    direction = "N";
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[0] = guardLocation[0] - 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                }else{
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                    guardLocation[1] = guardLocation[1] - 1;
+                                    fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
 
-                try{
-                    switch(direction){
-                        case "N":
-                            if(copy.get(guardLocation[0]-1).charAt(guardLocation[1]) == "#".toCharArray()[0]){
-                                direction = "E";
-                                guardLocation[1] = guardLocation[1] + 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
-                            }else{
-                                guardLocation[0] = guardLocation[0] - 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
+                                }
+                                break;
+                        }
 
-                            }
-                            break;
-                        case "E":
-                            if(copy.get(guardLocation[0]).charAt(guardLocation[1]+1) == "#".toCharArray()[0]){
-                                direction = "S";
-                                guardLocation[0] = guardLocation[0] + 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
-                            }else{
-                                guardLocation[1] = guardLocation[1] + 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
-                            }
-                            break;
-                        case "S":
-                            if(copy.get(guardLocation[0]+1).charAt(guardLocation[1]) == "#".toCharArray()[0]){
-                                direction = "W";
-                                guardLocation[1] = guardLocation[1] - 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
-                            }else{
-                                guardLocation[0] = guardLocation[0] + 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
-
-                            }
-                            break;
-                        case "W":
-                            if(copy.get(guardLocation[0]).charAt(guardLocation[1]-1) == "#".toCharArray()[0]){
-                                direction = "N";
-                                guardLocation[0] = guardLocation[0] - 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
-                            }else{
-                                guardLocation[1] = guardLocation[1] - 1;
-                                copy.set(guardLocation[0], copy.get(guardLocation[0]).substring(0,guardLocation[1]) + "^" + copy.get(guardLocation[0]).substring(guardLocation[1]+1));
-                            }
-                            break;
+                    }catch(IndexOutOfBoundsException e){
+                        fileData.set(guardLocation[0], fileData.get(guardLocation[0]).substring(0,guardLocation[1]) + "X" + fileData.get(guardLocation[0]).substring(guardLocation[1]+1));
+                        break;
                     }
-
-                }catch(IndexOutOfBoundsException e){
-                    break;
-                }
             }
-            copy = (ArrayList)input.clone();
         }
-
-
-        System.out.println(xLocations);
-        return total;
+        return 0;
     }
     public static ArrayList<String> getFileData(String fileName) {
         ArrayList<String> fileData = new ArrayList<String>();
