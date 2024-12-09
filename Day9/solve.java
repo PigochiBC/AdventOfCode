@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class solve {
 
     public static void main(String[] args){
-        ArrayList<String> fileData = getFileData("Day9/input.txt");
+        ArrayList<String> fileData = getFileData("input.txt");
         ArrayList<Integer> sortedFileData = new ArrayList<>();
         ArrayList<String> outputFileData = new ArrayList<>();
         for(int i = 0; i < fileData.size(); i++){
@@ -34,27 +34,58 @@ public class solve {
         //sorting algorithm to swap empty space with rightmost ID
         for(int i = 0; i < outputFileData.size(); i++){
             if(outputFileData.get(i).equals(".")){
+
                 int toSwapIndex = i;
-                for(int j = i; j < outputFileData.size(); j++){
-                    if(outputFileData.get(j).equals(".")){
-                        continue;
-                    }else{
-                        toSwapIndex = j;
+                int lengthOfFile = 0;
+                int fileStartIndex = 0;
+                for(int j = outputFileData.size()-1; j > i ; j--){
+                    if(!outputFileData.get(j).equals(".")){
+                        lengthOfFile = 0;
+                        for(int x = j; x > i; x--){
+                            if(!outputFileData.get(x).equals(".") && outputFileData.get(x).equals(outputFileData.get(j)) ){
+                                lengthOfFile++;
+                                fileStartIndex = j;
+                            }else{
+                                break;
+                            }
+                        }
+                        for(int z = 0; z < outputFileData.size(); z++){
+                            int lengthOfEmpty = 1;
+                            for(int k = outputFileData.size()-1; k < z; k++){
+                                if(outputFileData.get(k-1).equals(".")){
+                                    lengthOfEmpty++;
+                                }else{
+                                    lengthOfEmpty = 0;
+
+                                }
+                            }
+                            if(lengthOfEmpty>=lengthOfFile){
+                                for(int y = 0; y < lengthOfFile; y++){
+                                    System.out.println(lengthOfFile + " " + lengthOfEmpty);
+                                    outputFileData.set(toSwapIndex+y, outputFileData.get(fileStartIndex-y));
+                                    outputFileData.set(fileStartIndex-y, ".");
+                                    System.out.println(outputFileData);
+                                }
+                            }
+                        }
+
                     }
+
                 }
-                outputFileData.set(i, outputFileData.get(toSwapIndex));
-                outputFileData.set(toSwapIndex, ".");
+
+
+
+
             }
         }
+        System.out.println(outputFileData);
         //solution
         Long total = 0L;
         for(int i = 0; i < outputFileData.size(); i++){
-            if(outputFileData.get(i).equals(".")){
-                break;
-            }
-            else{
+            if(!outputFileData.get(i).equals(".")){
                 total+=Integer.parseInt(outputFileData.get(i))*i;
             }
+
         }
         System.out.println(total);
     }
