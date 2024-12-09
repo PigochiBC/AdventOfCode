@@ -31,53 +31,49 @@ public class solve {
             }
         }
 
-        //sorting algorithm to swap empty space with rightmost ID
-        for(int i = 0; i < outputFileData.size(); i++){
-            if(outputFileData.get(i).equals(".")){
+        /*
+             Start with a length of IDs
+             THEN iterate to find a length of .'s <= length of IDs
+         */
+        for(int i = outputFileData.size()-1; i >=0; i--){
+            int lengthOfEmpty = 0;
+            int emptyStartIndex = 0;
+            int lengthOfFile = 0;
+            int fileStartIndex = 0;
 
-                int toSwapIndex = i;
-                int lengthOfFile = 0;
-                int fileStartIndex = 0;
-                for(int j = outputFileData.size()-1; j > i ; j--){
-                    if(!outputFileData.get(j).equals(".")){
-                        lengthOfFile = 0;
-                        for(int x = j; x > i; x--){
-                            if(!outputFileData.get(x).equals(".") && outputFileData.get(x).equals(outputFileData.get(j)) ){
-                                lengthOfFile++;
-                                fileStartIndex = j;
-                            }else{
-                                break;
-                            }
-                        }
-                        for(int z = 0; z < outputFileData.size(); z++){
-                            int lengthOfEmpty = 1;
-                            for(int k = outputFileData.size()-1; k < z; k++){
-                                if(outputFileData.get(k-1).equals(".")){
-                                    lengthOfEmpty++;
-                                }else{
-                                    lengthOfEmpty = 0;
-
-                                }
-                            }
-                            if(lengthOfEmpty>=lengthOfFile){
-                                for(int y = 0; y < lengthOfFile; y++){
-                                    System.out.println(lengthOfFile + " " + lengthOfEmpty);
-                                    outputFileData.set(toSwapIndex+y, outputFileData.get(fileStartIndex-y));
-                                    outputFileData.set(fileStartIndex-y, ".");
-                                    System.out.println(outputFileData);
-                                }
-                            }
-                        }
-
+            if(!outputFileData.get(i).equals(".")){
+                //get the length of nums
+                for(int j = i; j >= 0; j--){
+                    if(outputFileData.get(j).equals(".") || !outputFileData.get(j).equals(outputFileData.get(i))){
+                        //set file index to j to get the string of num bers
+                        //set i to j to find next number available
+                        fileStartIndex = j+1;
+                        i = j+1;
+                        break;
+                    }else{
+                        lengthOfFile++;
                     }
-
                 }
 
-
-
-
+                for(int jj=0; jj <= i; jj++){
+                    if(outputFileData.get(jj).equals(".")){
+                        lengthOfEmpty++;
+                        if(lengthOfFile <= lengthOfEmpty){
+                            for(int k = 0; k < lengthOfFile; k++){
+                                outputFileData.set(emptyStartIndex+1+k, outputFileData.get(fileStartIndex+k));
+                                outputFileData.set(fileStartIndex+k, ".");
+                            }
+                            //end loop to make sure its not replaced in more than one spot
+                            break;
+                        }
+                    }else{
+                        emptyStartIndex = jj - lengthOfEmpty;
+                        lengthOfEmpty = 0;
+                    }
+                }
             }
         }
+
         System.out.println(outputFileData);
         //solution
         Long total = 0L;
