@@ -2,9 +2,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class solve {
+    static HashSet<String> hashSet = new HashSet<>();
 
     public static void main(String[] args){
         ArrayList<String> fileData = getFileData("input.txt");
@@ -15,6 +17,7 @@ public class solve {
         System.out.println(fileDataTo2DArr);
         System.out.println(zeroPositions);
         //iterate through every zero positions to check for trailheads
+        int trailHeads = 0;
         for(int i = 0; i < zeroPositions.size(); i++){
             //start position
             int zeroX = zeroPositions.get(i).get(0);
@@ -26,105 +29,85 @@ public class solve {
                 fileDataTo2DArrCopy.add(a);
             }
 
-            int searchingFor = 1;
-            int currentXPos = zeroX;
-            int currentYPos = zeroY;
-
-            int[] checkDeadEnd = new int[]{zeroX,zeroY};
-            while(true){
-                boolean stuck = false;
-
-                while(true){
-                    //check North
-                    if(currentXPos - 1 >= 0){
-                        if(fileDataTo2DArrCopy.get(currentXPos-1).get(currentYPos) == searchingFor){
-                            currentXPos = currentXPos-1;
-                            checkDeadEnd = new int[]{currentXPos,currentYPos};
-                            searchingFor++;
-                            break;
-                        }else{
-                            System.out.println("North Fail");
-                            System.out.println("Didnt find " + searchingFor + " at " + (currentXPos-1) + " " + currentYPos);
-                            System.out.println(fileDataTo2DArrCopy.get(currentXPos-1));
-                        }
-                    }
-                    //check south
-                    if(currentXPos + 1 < fileDataTo2DArrCopy.size()){
-                        if(fileDataTo2DArrCopy.get(currentXPos+1).get(currentYPos) == searchingFor){
-                            currentXPos = currentXPos+1;
-                            checkDeadEnd = new int[]{currentXPos,currentYPos};
-                            searchingFor++;
-                            break;
-                        }
-//                        else{
-//                            System.out.println("South Fail: ");
-//                            System.out.println(fileDataTo2DArrCopy.get(currentXPos+1));
-//                            System.out.println("Didnt find " + searchingFor + " at " + (currentXPos+1) + " " + currentYPos);
-//                        }
-                    }
-                    //check East
-                    if(currentYPos + 1 < fileDataTo2DArrCopy.get(currentXPos).size()){
-                        if(fileDataTo2DArrCopy.get(currentXPos).get(currentYPos+1) == searchingFor){
-                            currentYPos = currentYPos+1;
-                            checkDeadEnd = new int[]{currentXPos,currentYPos};
-                            searchingFor++;
-                            break;
-                        }
-//                        else{
-//                            System.out.println("East Fail");
-//                            System.out.println(fileDataTo2DArrCopy.get(currentXPos));
-//                            System.out.println("Didnt find " + searchingFor + " at " + currentXPos + " " + (currentYPos+1));
-//                        }
-                    }
-                    //check west
-                    if(currentYPos - 1 >= 0){
-                        if(fileDataTo2DArrCopy.get(currentXPos).get(currentYPos-1) == searchingFor){
-                            currentYPos = currentYPos-1;
-                            checkDeadEnd = new int[]{currentXPos,currentYPos};
-                            searchingFor++;
-                            break;
-                        }else{
-                            //go back a space
-                            System.out.println("West Fail");
-                            System.out.println("Going back a space at " + currentXPos + " " + currentYPos);
-                            System.out.println(fileDataTo2DArrCopy.get(currentXPos));
-                            fileDataTo2DArrCopy.get(checkDeadEnd[0]).set(checkDeadEnd[1], -1);
-                            if((currentXPos - 1 > 0 && fileDataTo2DArrCopy.get(currentXPos-1).get(currentYPos) == -1) || currentXPos - 1 <0 &&
-                                    (currentXPos + 1 < fileDataTo2DArrCopy.size() && fileDataTo2DArrCopy.get(currentXPos+1).get(currentYPos) == -1) || currentXPos + 1 >= fileDataTo2DArrCopy.size()){
-                                stuck = true;
-                                break;
-                            }
-                            currentXPos = zeroX;
-                            currentYPos = zeroY;
-                            searchingFor--;
-
-                        }
-                    }
-                    if(!(currentYPos + 1 < fileDataTo2DArrCopy.get(currentXPos).size()) && !(currentXPos + 1 < fileDataTo2DArrCopy.size() || currentXPos - 1 > 0)){
-
-                        fileDataTo2DArrCopy.get(checkDeadEnd[0]).set(checkDeadEnd[1], -1);
-                        if(currentYPos == previousYPos){
-                            stuck = true;
-                            break;
-                        }
-                        currentXPos = zeroX;
-                        currentYPos = zeroY;
-                        searchingFor--;
-                    }
-                }
-
-                if(searchingFor>=9){
-                    trailheads++;
-                    searchingFor = 1;
-                    fileDataTo2DArrCopy.get(checkDeadEnd[0]).set(checkDeadEnd[1], -1);
-
-                }
-                if(stuck)break;
-                currentXPos = zeroX;
-                currentYPos = zeroY;
-            }
-            System.out.println(trailheads);
+            trailheads+=findTrailHeads(zeroX,zeroY,fileDataTo2DArrCopy,0,1);
         }
+        System.out.println(hashSet);
+    }
+    public static int findTrailHeads(int currentX, int currentY, ArrayList<ArrayList<Integer>> inputArray, int trailHead, int toSearch){
+        //North - East - South - West
+        boolean[] canCheckNtoW = new boolean[]{true,true,true,true};
+        int trailHeads = trailHead;
+        int notFoundCounter = 0;
+        //north bound check
+        if(currentX - 1 < 0 ){
+            canCheckNtoW[0] = false;
+        }
+        //south bound check
+        if (currentX+1 >= inputArray.size() ){
+            canCheckNtoW[2] = false;
+        }
+        //east bound check
+        if(currentY - 1 < 0 && canCheckNtoW[2]){
+            canCheckNtoW[3] = false;
+        }
+        if( currentY+1 >= inputArray.get(currentX).size() ){
+
+            canCheckNtoW[1] = false;
+        }
+        //west bound check
+
+        int temp = trailHeads;
+        if(canCheckNtoW[0] && inputArray.get(currentX-1).get(currentY) == toSearch){
+            toSearch++;
+            if(!(toSearch>9)){
+                trailHeads+= findTrailHeads(currentX-1,currentY,inputArray,trailHead,toSearch);
+
+            }else{
+                hashSet.add(currentX-1 + "," + currentY);
+            }
+        }else{
+            notFoundCounter++;
+        }
+        if(canCheckNtoW[1] && inputArray.get(currentX).get(currentY+1) == toSearch){
+            toSearch++;
+            if(!(toSearch>9)){
+
+                trailHeads+= findTrailHeads(currentX,currentY+1,inputArray,trailHead,toSearch);
+
+            }else{
+                hashSet.add(currentX + "," + currentY);
+            }
+        }else{
+            notFoundCounter++;
+        }
+        if(canCheckNtoW[2] && inputArray.get(currentX+1).get(currentY) == toSearch){
+            toSearch++;
+            if(!(toSearch>9)){
+                trailHeads+= findTrailHeads(currentX+1,currentY,inputArray,trailHead,toSearch);
+
+            }else{
+                hashSet.add(currentX + "," + currentY);
+            }
+        }else{
+            notFoundCounter++;
+        }
+        if(canCheckNtoW[3] && inputArray.get(currentX).get(currentY-1) == toSearch){
+            toSearch++;
+            if(!(toSearch>9)){
+                trailHeads+= findTrailHeads(currentX-1,currentY,inputArray,trailHead,toSearch);
+            }else{
+                hashSet.add(currentX + "," + currentY);
+            }
+        }else{
+            notFoundCounter++;
+        }
+
+        if(notFoundCounter==4){
+            return 0;
+        }
+
+
+        return 1;
     }
 
     //put fileData into 2d Array
