@@ -12,7 +12,6 @@ public class solve {
         ArrayList<String> fileData = getFileData("input.txt");
         ArrayList<ArrayList<Integer>> fileDataTo2DArr = sortFileData(fileData);
         ArrayList<ArrayList<Integer>> zeroPositions = getZeroPositions(fileDataTo2DArr);
-        int trailheads = 0;
 
         System.out.println(fileDataTo2DArr);
         System.out.println(zeroPositions);
@@ -24,14 +23,11 @@ public class solve {
             int zeroY = zeroPositions.get(i).get(1);
 
             //make copy of filedata2D array since Incorrect turns will be turned into "X"
-            ArrayList<ArrayList<Integer>> fileDataTo2DArrCopy = new ArrayList<>();
-            for(ArrayList<Integer> a: fileDataTo2DArr){
-                fileDataTo2DArrCopy.add(a);
-            }
+            ArrayList<ArrayList<Integer>> fileDataTo2DArrCopy = new ArrayList<>(fileDataTo2DArr);
 
-            trailheads+=findTrailHeads(zeroX,zeroY,fileDataTo2DArrCopy,0,1);
+            trailHeads+=findTrailHeads(zeroX,zeroY,fileDataTo2DArrCopy,0,1 );
         }
-        System.out.println(hashSet);
+        System.out.println(trailHeads);
     }
     public static int findTrailHeads(int currentX, int currentY, ArrayList<ArrayList<Integer>> inputArray, int trailHead, int toSearch){
         //North - East - South - West
@@ -46,57 +42,42 @@ public class solve {
         if (currentX+1 >= inputArray.size() ){
             canCheckNtoW[2] = false;
         }
-        //east bound check
-        if(currentY - 1 < 0 && canCheckNtoW[2]){
+        //westbound check
+        if(currentY - 1 < 0 ){
             canCheckNtoW[3] = false;
         }
+        //eastbound check
         if( currentY+1 >= inputArray.get(currentX).size() ){
-
             canCheckNtoW[1] = false;
         }
-        //west bound check
 
-        int temp = trailHeads;
         if(canCheckNtoW[0] && inputArray.get(currentX-1).get(currentY) == toSearch){
-            toSearch++;
             if(!(toSearch>9)){
-                trailHeads+= findTrailHeads(currentX-1,currentY,inputArray,trailHead,toSearch);
-
-            }else{
-                hashSet.add(currentX-1 + "," + currentY);
+                trailHeads= trailHeads + findTrailHeads(currentX-1,currentY,inputArray,trailHeads,toSearch+1);
             }
         }else{
             notFoundCounter++;
         }
         if(canCheckNtoW[1] && inputArray.get(currentX).get(currentY+1) == toSearch){
-            toSearch++;
             if(!(toSearch>9)){
-
-                trailHeads+= findTrailHeads(currentX,currentY+1,inputArray,trailHead,toSearch);
-
-            }else{
-                hashSet.add(currentX + "," + currentY);
+                trailHeads= trailHeads + findTrailHeads(currentX,currentY+1,inputArray,trailHeads,toSearch+1);
             }
         }else{
             notFoundCounter++;
         }
         if(canCheckNtoW[2] && inputArray.get(currentX+1).get(currentY) == toSearch){
-            toSearch++;
             if(!(toSearch>9)){
-                trailHeads+= findTrailHeads(currentX+1,currentY,inputArray,trailHead,toSearch);
-
-            }else{
-                hashSet.add(currentX + "," + currentY);
+                trailHeads= trailHeads + findTrailHeads(currentX+1,currentY,inputArray,trailHeads,toSearch+1);
             }
+
         }else{
             notFoundCounter++;
         }
         if(canCheckNtoW[3] && inputArray.get(currentX).get(currentY-1) == toSearch){
-            toSearch++;
             if(!(toSearch>9)){
-                trailHeads+= findTrailHeads(currentX-1,currentY,inputArray,trailHead,toSearch);
-            }else{
-                hashSet.add(currentX + "," + currentY);
+                System.out.println(trailHeads);
+                trailHeads= trailHeads + findTrailHeads(currentX,currentY-1,inputArray,trailHeads,toSearch+1);
+                System.out.println(trailHeads);
             }
         }else{
             notFoundCounter++;
@@ -106,8 +87,7 @@ public class solve {
             return 0;
         }
 
-
-        return 1;
+        return trailHead+1;
     }
 
     //put fileData into 2d Array
