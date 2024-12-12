@@ -1,3 +1,4 @@
+package Day10;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -7,32 +8,40 @@ import java.util.Scanner;
 
 public class solve {
     static HashSet<String> hashSet = new HashSet<>();
-
+    static int counter = 0;
+    static int zeroX = 0;
+    static int zeroY = 0;
     public static void main(String[] args){
-        ArrayList<String> fileData = getFileData("input.txt");
+        ArrayList<String> fileData = getFileData("Day10/input.txt");
         ArrayList<ArrayList<Integer>> fileDataTo2DArr = sortFileData(fileData);
         ArrayList<ArrayList<Integer>> zeroPositions = getZeroPositions(fileDataTo2DArr);
-
+        int trailheads = 0;
+        
         System.out.println(fileDataTo2DArr);
         System.out.println(zeroPositions);
         //iterate through every zero positions to check for trailheads
-        int trailHeads = 0;
         for(int i = 0; i < zeroPositions.size(); i++){
             //start position
-            int zeroX = zeroPositions.get(i).get(0);
-            int zeroY = zeroPositions.get(i).get(1);
+             zeroX = zeroPositions.get(i).get(0);
+             zeroY = zeroPositions.get(i).get(1);
 
-            //make copy of filedata2D array since Incorrect turns will be turned into "X"
-            ArrayList<ArrayList<Integer>> fileDataTo2DArrCopy = new ArrayList<>(fileDataTo2DArr);
+            ArrayList<ArrayList<Integer>> fileDataTo2DArrCopy = new ArrayList<>();
+            for(ArrayList<Integer> a: fileDataTo2DArr){
+                fileDataTo2DArrCopy.add(a);
+            }
 
-            trailHeads+=findTrailHeads(zeroX,zeroY,fileDataTo2DArrCopy,0,1 );
+            trailheads+=findTrailHeads(zeroX,zeroY,fileDataTo2DArrCopy,0,1, 0);
+            
         }
-        System.out.println(trailHeads);
+        System.out.println(counter);
+        for(int i = 0; i < hashSet.size(); i++){
+            System.out.println(i+1);
+        }
     }
-    public static int findTrailHeads(int currentX, int currentY, ArrayList<ArrayList<Integer>> inputArray, int trailHead, int toSearch){
+    public static int findTrailHeads(int currentX, int currentY, ArrayList<ArrayList<Integer>> inputArray, int trailHead, int toSearch, int iteration){
         //North - East - South - West
         boolean[] canCheckNtoW = new boolean[]{true,true,true,true};
-        int trailHeads = trailHead;
+        int trailHeads = 0;
         int notFoundCounter = 0;
         //north bound check
         if(currentX - 1 < 0 ){
@@ -42,52 +51,57 @@ public class solve {
         if (currentX+1 >= inputArray.size() ){
             canCheckNtoW[2] = false;
         }
-        //westbound check
-        if(currentY - 1 < 0 ){
+        //east bound check
+        if(currentY - 1 < 0){
             canCheckNtoW[3] = false;
         }
-        //eastbound check
         if( currentY+1 >= inputArray.get(currentX).size() ){
+
             canCheckNtoW[1] = false;
         }
-
+        //west bound check
         if(canCheckNtoW[0] && inputArray.get(currentX-1).get(currentY) == toSearch){
             if(!(toSearch>9)){
-                trailHeads= trailHeads + findTrailHeads(currentX-1,currentY,inputArray,trailHeads,toSearch+1);
+                
+                trailHeads+= findTrailHeads(currentX-1,currentY,inputArray,trailHeads,toSearch+1, iteration+1);
+                
             }
         }else{
             notFoundCounter++;
         }
         if(canCheckNtoW[1] && inputArray.get(currentX).get(currentY+1) == toSearch){
             if(!(toSearch>9)){
-                trailHeads= trailHeads + findTrailHeads(currentX,currentY+1,inputArray,trailHeads,toSearch+1);
+
+                trailHeads+= findTrailHeads(currentX,currentY+1,inputArray,trailHeads,toSearch+1, iteration+1);
+                
             }
         }else{
             notFoundCounter++;
         }
         if(canCheckNtoW[2] && inputArray.get(currentX+1).get(currentY) == toSearch){
             if(!(toSearch>9)){
-                trailHeads= trailHeads + findTrailHeads(currentX+1,currentY,inputArray,trailHeads,toSearch+1);
-            }
+                trailHeads+= findTrailHeads(currentX+1,currentY,inputArray,trailHeads,toSearch+1, iteration+1);
 
+            }
         }else{
             notFoundCounter++;
         }
         if(canCheckNtoW[3] && inputArray.get(currentX).get(currentY-1) == toSearch){
             if(!(toSearch>9)){
-                System.out.println(trailHeads);
-                trailHeads= trailHeads + findTrailHeads(currentX,currentY-1,inputArray,trailHeads,toSearch+1);
-                System.out.println(trailHeads);
+                trailHeads+= findTrailHeads(currentX,currentY-1,inputArray,trailHeads,toSearch+1, iteration+1);
             }
         }else{
             notFoundCounter++;
         }
-
-        if(notFoundCounter==4){
+        
+        if(notFoundCounter==4 && toSearch!=10){
             return 0;
         }
-
-        return trailHead+1;
+        if(toSearch==10){
+            counter++;
+        }
+        return trailHead;
+        
     }
 
     //put fileData into 2d Array
@@ -127,6 +141,7 @@ public class solve {
                 if (!line.equals(""))
                     fileData.add(line);
             }
+            s.close();
             return fileData;
         }
         catch (FileNotFoundException e) {
