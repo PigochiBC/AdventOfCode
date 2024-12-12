@@ -10,37 +10,43 @@ public class solve {
         String[] fileDataSplit = fileData.getFirst().split(" ");
         HashMap<Long, Long> fileDataAsLongs = new HashMap<>();
         for(String el: fileDataSplit){
-            fileDataAsLongs.put(Long.parseLong(el), 1L);
+            fileDataAsLongs.put(Long.parseLong(el), 2L);
         }
         fileDataAsLongs.put(1L, 0L);
 
-        /*
-            Rules in this order:
-            Stones that are 0 : Turn into 1
-            Stones with even number of digits: split into 2 stones (Middle Left digit, middle right digit), leading 0's not kept.
-            Neither 0 nor even digits: multiplied by 2024.
-         */
         calcBlinks(fileDataAsLongs, 0);
-        System.out.println(fileDataAsLongs);
     }
     public static HashMap<Long,Long > calcBlinks(HashMap<Long, Long> inputHash, int blinks){
         if(blinks==75){
             return inputHash;
         }
-        System.out.println(inputHash);
+        HashMap<Long, Long> newHashMap = new HashMap<>(inputHash);
         for(Long key : inputHash.keySet()){
-            //rule 1
             if(key == 0 && inputHash.get(0L) > 0){
-                inputHash.put(1L, inputHash.get(1L)+1L);
-                inputHash.put(0L, inputHash.get(0L)-1L);
-                calcBlinks(inputHash, blinks+1);
+                newHashMap.replace(1L, inputHash.get(0L));
+                newHashMap.replace(0L, 0L);
+            }else if(key.toString().length()%2 == 0L && inputHash.get(key) > 0){
+                long key1 = Long.parseLong(key.toString().substring(key.toString().length() / 2));
+                long key2 = Long.parseLong(key.toString().substring(0,key.toString().length()/2));
+
+                newHashMap.putIfAbsent(key1, inputHash.get(key));
+                newHashMap.putIfAbsent(key2, inputHash.get(key));
+
+                newHashMap.replace(key1,inputHash.get(key));
+                newHashMap.replace(key2, inputHash.get(key));
+                newHashMap.replace(key, 0L);
             }
-            if(key == 1 && inputHash.get(1L) > 0){
-                inputHash.put(1L, inputHash.get(1L)-1L);
-                inputHash.put(2024L, inputHash.get(2024L) -1L);
+            //rule 3
+            else if(inputHash.get(key) > 0){
+                newHashMap.putIfAbsent(2024L*key, inputHash.get(key));
+                newHashMap.replace(2024L*key, inputHash.get(key));
+                newHashMap.replace(key, 0L);
+
             }
+
         }
-        return null;
+        System.out.println(inputHash);
+        return calcBlinks(newHashMap, blinks+1);
     }
 
     public static ArrayList<String> getFileData(String fileName) {
