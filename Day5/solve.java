@@ -1,91 +1,46 @@
-package Day5;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Scanner;
-import java.util.Arrays;
 
 public class solve {
-    static boolean rulesSwitch = false;
-    static ArrayList<String> inputStrings = new ArrayList<>();
     public static void main(String[] args){
         ArrayList<String> fileData = getFileData("input.txt");
-        ArrayList<Integer> fileDataJustNums;
-        ArrayList<Integer> fileDataJustRules;
-        ArrayList<Integer> currentInputIteration = getNewIteration(inputStrings, 0);
+        String[] fileDataSplit = fileData.getFirst().split(" ");
+        ArrayList<Long> fileDataAsLongs = new ArrayList<>();
+        for(String el: fileDataSplit){
+            fileDataAsLongs.add(Long.parseLong(el));
+        }
         /*
-         * Algorithm:
-         *   1. Get just nums in array to its own arraylist, and rules into its own list
-         *   2. Remove irrelevent info from nums and rules by comparing to current iteration of input
-         *   3. Sort rules array L-G to make sure all number rules are done at the same time
-         *   4. Swap nums array spots based on the rules
-         *   5. if given list = sorted list, total+= middle num.
+            Rules in this order:
+            Stones that are 0 : Turn into 1
+            Stones with even number of digits: split into 2 stones (Middle Left digit, middle right digit), leading 0's not kept.
+            Neither 0 nor even digits: multiplied by 2024.
          */
-        int total = 0;
-        for(int x =0; x < inputStrings.size(); x++){
-            fileDataJustNums = new ArrayList<>();
-            fileDataJustRules = new ArrayList<>();
-            currentInputIteration = getNewIteration(inputStrings, x);
+        for(int i = 0 ; i < 25; i ++){
+            for(int j = 0; j < fileDataAsLongs.size(); j++){
+                //rule 1
+                if(fileDataAsLongs.get(j)==0L){
+                    fileDataAsLongs.set(j, 1L);
+                }
+                //rule 2
+                else if(fileDataAsLongs.get(j).toString().length()%2==0L){
 
-            for(int i =0; i < fileData.size(); i++){
-                if(currentInputIteration.contains(Integer.parseInt(fileData.get(i).split("\\|")[0])) && currentInputIteration.contains(Integer.parseInt(fileData.get(i).split("\\|")[1]))){
-                    fileDataJustRules.add(Integer.parseInt(fileData.get(i).split("\\|")[0] + "" + fileData.get(i).split("\\|")[1]));
-                    if(!fileDataJustNums.contains(Integer.parseInt(fileData.get(i).split("\\|")[0]))) fileDataJustNums.add(Integer.parseInt(fileData.get(i).split("\\|")[0]));
+                    String temp = fileDataAsLongs.get(j).toString();
+                    //System.out.println(j +" " + fileDataAsLongs);
+                    Long leftHalf = Long.parseLong(temp.substring(0,temp.length()/2));
+                    Long rightHalf = Long.parseLong(temp.substring(temp.length()/2));
+                    fileDataAsLongs.set(j, leftHalf);
+                    fileDataAsLongs.add(j+1,rightHalf);
+                    j++;
+                }
+                //rule 3
+                else{
+                    fileDataAsLongs.set(j, fileDataAsLongs.get(j)*2024);
                 }
             }
-            Collections.sort(fileDataJustRules);
-
-            for(int i = 0; i < currentInputIteration.size(); i++){
-                if(!fileDataJustNums.contains(currentInputIteration.get(i))){
-                    fileDataJustNums.add(currentInputIteration.get(i));
-                }
-            }
-
-
-            ArrayList<Integer> finished = sortArray(fileDataJustNums,fileDataJustRules);
-            if(!finished.equals(currentInputIteration)) {
-
-                total+= finished.get(finished.size()/2);
-            }else{
-            }
         }
-        System.out.println(total);
-
-    }
-
-    public static ArrayList<Integer> sortArray(ArrayList<Integer> input, ArrayList<Integer> rules){
-        for(int i =0; i < input.size(); i++){
-            for(int j = 0; j < rules.size(); j++){
-
-                  //checks if rules at j index starts with the input at input index
-                  if(rules.get(j).toString().startsWith(input.get(i).toString())){
-                      int lesserThan = input.get(i);
-                      int greaterThan = Integer.parseInt(rules.get(j).toString().substring(input.get(i).toString().length()));
-
-                      //check indexes in input up to index lesserThanIndex to move items around.
-                      for(int k = 0; k < i; k++){
-                          if(input.get(k) == greaterThan){
-                              int temp = input.get(k);
-                              input.remove(k);
-                              input.add(i, temp);
-                              i--;
-                          }
-                      }
-
-                  }
-            }
-        }
-        return input;
-    }
-
-    public static ArrayList<Integer> getNewIteration(ArrayList<String> inputContainer, int iteration){
-        ArrayList<Integer> toReturn = new ArrayList<>();
-        for(int i =0; i < inputContainer.get(iteration).split(",").length; i++){
-            toReturn.add(Integer.parseInt(inputContainer.get(iteration).split(",")[i]));
-        }
-        return toReturn;
+        System.out.println(fileDataAsLongs.size());
     }
 
     public static ArrayList<String> getFileData(String fileName) {
@@ -95,15 +50,10 @@ public class solve {
             Scanner s = new Scanner(f);
             while (s.hasNextLine()) {
                 String line = s.nextLine();
-                if (!line.equals("") && !rulesSwitch)
+                if (!line.equals(""))
                     fileData.add(line);
-                else if(rulesSwitch){
-                    inputStrings.add(line);
-                }
-                else{
-                    rulesSwitch = true;
-                }
             }
+            s.close();
             return fileData;
         }
         catch (FileNotFoundException e) {
